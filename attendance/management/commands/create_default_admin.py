@@ -4,7 +4,7 @@ from attendance.models import User
 
 
 class Command(BaseCommand):
-    help = "Create or update the first local admin account."
+    help = "Create the default admin account if it does not exist."
 
     def add_arguments(self, parser):
         parser.add_argument("--username", default="admin")
@@ -19,8 +19,9 @@ class Command(BaseCommand):
         user.is_superuser = True
         user.is_active = True
         user.is_employee_active = True
-        user.set_password(options["password"])
+        if created:
+            user.set_password(options["password"])
         user.save()
 
-        action = "Created" if created else "Updated"
+        action = "Created" if created else "Verified"
         self.stdout.write(self.style.SUCCESS(f"{action} admin user '{user.username}'."))

@@ -5,7 +5,7 @@ services:
     plan: free
     buildCommand: bash build.sh
     preDeployCommand: python manage.py migrate
-    startCommand: gunicorn attendance_project.wsgi:application
+    startCommand: python manage.py migrate && python manage.py create_default_admin --username "${ADMIN_USERNAME:-admin}" --password "${ADMIN_PASSWORD:-admin}" && gunicorn attendance_project.wsgi:application
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.3
@@ -14,7 +14,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: ".onrender.com,localhost,127.0.0.1"
+        value: "*"
       - key: CSRF_TRUSTED_ORIGINS
         value: "https://*.onrender.com"
       - key: ADMIN_USERNAME
