@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--username", default="admin")
-        parser.add_argument("--password", default="admin12345")
+        parser.add_argument("--password", default="admin")
         parser.add_argument("--email", default="admin@example.com")
 
     def handle(self, *args, **options):
