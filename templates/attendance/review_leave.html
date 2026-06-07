@@ -1,0 +1,18 @@
+{% extends "attendance/base.html" %}
+{% block title %}Review Leave{% endblock %}
+{% block content %}
+<section class="form-page">
+    <h1>Review Leave</h1>
+    <article class="card">
+        <p>Employee: {{ leave.employee.get_full_name|default:leave.employee.username }}</p>
+        <p>Dates: {{ leave.start_date }} to {{ leave.end_date }} ({{ leave.total_days }} day{{ leave.total_days|pluralize }})</p>
+        <p>Reason: {{ leave.reason }}</p>
+    </article>
+    <form method="post" class="form-panel">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="primary" type="submit">Submit Review</button>
+        <a class="button" href="{% url 'dashboard' %}">Cancel</a>
+    </form>
+</section>
+{% endblock %}

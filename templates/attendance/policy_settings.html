@@ -1,0 +1,13 @@
+{% extends "attendance/base.html" %}
+{% block title %}Office Rules{% endblock %}
+{% block content %}
+<section class="form-page">
+    <h1>Office Rules</h1>
+    <form method="post" class="form-panel">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="primary" type="submit">Save Rules</button>
+        <a class="button" href="{% url 'admin_dashboard' %}">Cancel</a>
+    </form>
+</section>
+{% endblock %}

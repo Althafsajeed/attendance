@@ -1,0 +1,96 @@
+{% extends "attendance/base.html" %}
+{% block title %}Attendance Report{% endblock %}
+{% block content %}
+<section class="dashboard-head">
+    <div>
+        <h1>Attendance Report</h1>
+        <p>Filter employee attendance from {{ from_date }} to {{ to_date }}.</p>
+    </div>
+    <a class="button" href="{% url 'admin_dashboard' %}">Dashboard</a>
+</section>
+
+<form method="get" class="filter-panel">
+    <label>
+        Employee
+        <select name="employee">
+            <option value="">All employees</option>
+            {% for employee in employees %}
+                <option value="{{ employee.id }}" {% if selected_employee == employee.id|stringformat:"s" %}selected{% endif %}>
+                    {{ employee.get_full_name|default:employee.username }}
+                </option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>
+        Period
+        <select name="preset">
+            <option value="week" {% if preset == "week" %}selected{% endif %}>This week</option>
+            <option value="month" {% if preset == "month" %}selected{% endif %}>This month</option>
+            <option value="year" {% if preset == "year" %}selected{% endif %}>This year</option>
+            <option value="custom" {% if preset == "custom" %}selected{% endif %}>Custom</option>
+        </select>
+    </label>
+    <label>
+        From Date
+        <input type="date" name="from_date" value="{{ from_date|date:'Y-m-d' }}">
+    </label>
+    <label>
+        To Date
+        <input type="date" name="to_date" value="{{ to_date|date:'Y-m-d' }}">
+    </label>
+    <button class="primary" type="submit">Filter</button>
+</form>
+
+<section>
+    <h2>Employee Summary</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Employee</th><th>Present</th><th>Half Day</th><th>Leave</th><th>Total Hours</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for row in report_rows %}
+                <tr>
+                    <td>{{ row.employee.get_full_name|default:row.employee.username }}</td>
+                    <td>{{ row.present }}</td>
+                    <td>{{ row.half_day }}</td>
+                    <td>{{ row.leave }}</td>
+                    <td>{{ row.total_hours_display }}</td>
+                    <td>
+                        <a class="button small" href="{% url 'attendance_report_pdf' row.employee.id %}{{ row.download_url }}">Download PDF</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6">No employees found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section>
+    <h2>Attendance Records</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Employee</th><th>Date</th><th>Status</th><th>Check In</th><th>Exit</th><th>Hours</th><th>Distance</th></tr>
+            </thead>
+            <tbody>
+            {% for record in records %}
+                <tr>
+                    <td>{{ record.employee.get_full_name|default:record.employee.username }}</td>
+                    <td>{{ record.date }}</td>
+                    <td>{{ record.get_status_display }}</td>
+                    <td>{{ record.check_in_time|date:"h:i A"|default:"-" }}</td>
+                    <td>{{ record.check_out_time|date:"h:i A"|default:"-" }}</td>
+                    <td>{{ record.total_work_hours_display }}</td>
+                    <td>{{ record.distance_from_office_meters|floatformat:0|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">No attendance records for this filter.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

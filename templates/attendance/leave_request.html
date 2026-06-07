@@ -1,0 +1,13 @@
+{% extends "attendance/base.html" %}
+{% block title %}Request Leave{% endblock %}
+{% block content %}
+<section class="form-page">
+    <h1>Request Leave</h1>
+    <form method="post" class="form-panel">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="primary" type="submit">Send Request</button>
+        <a class="button" href="{% url 'dashboard' %}">Cancel</a>
+    </form>
+</section>
+{% endblock %}

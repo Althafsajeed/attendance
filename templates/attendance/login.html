@@ -1,0 +1,12 @@
+{% extends "attendance/base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<section class="auth-panel">
+    <h1>Employee Login</h1>
+    <form method="post" class="form-panel">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="primary" type="submit">Login</button>
+    </form>
+</section>
+{% endblock %}

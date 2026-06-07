@@ -1,0 +1,112 @@
+{% extends "attendance/base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<section class="dashboard-head">
+    <div>
+        <h1>Admin Dashboard</h1>
+        <p>Office location, employee accounts, attendance, leave requests, and daily rules.</p>
+    </div>
+    <div class="actions">
+        <a class="button" href="{% url 'attendance_report' %}">Reports</a>
+        <a class="button" href="{% url 'policy_settings' %}">Office Rules</a>
+        <a class="button primary" href="{% url 'create_employee' %}">Create Employee</a>
+    </div>
+</section>
+
+<section class="stats">
+    <article><span>{{ stats.employees }}</span><p>Employees</p></article>
+    <article><span>{{ stats.present }}</span><p>Present Today</p></article>
+    <article><span>{{ stats.half_day }}</span><p>Half Day Today</p></article>
+    <article><span>{{ stats.leave }}</span><p>Leave Today</p></article>
+    <article><span>{{ stats.pending_requests }}</span><p>Pending Requests</p></article>
+</section>
+
+<section class="grid two">
+    <article class="card">
+        <h2>Current Office Rules</h2>
+        <p>Attendance: {{ policy.attendance_start_time }} to {{ policy.attendance_end_time }}</p>
+        <p>Office: {{ policy.office_start_time }} to {{ policy.office_end_time }}</p>
+        <p>Location: {{ policy.latitude }}, {{ policy.longitude }} within {{ policy.allowed_radius_meters }} meters</p>
+    </article>
+    <article class="card">
+        <h2>Departments</h2>
+        {% for dept in departments %}
+            <p>{{ dept.department|default:"No Department" }}: {{ dept.total }}</p>
+        {% empty %}
+            <p>No employees created yet.</p>
+        {% endfor %}
+    </article>
+</section>
+
+<section>
+    <h2>Pending Leave Requests</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Employee</th><th>Manager</th><th>Dates</th><th>Reason</th><th></th></tr></thead>
+            <tbody>
+            {% for leave in leave_requests %}
+                <tr>
+                    <td>{{ leave.employee.get_full_name|default:leave.employee.username }}</td>
+                    <td>{{ leave.manager.get_full_name|default:leave.manager.username|default:"Admin" }}</td>
+                    <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
+                    <td>{{ leave.reason|truncatechars:80 }}</td>
+                    <td><a class="button small" href="{% url 'review_leave_request' leave.pk %}">Review</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">No pending requests.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section>
+    <h2>Employees</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Name</th><th>Code</th><th>Role</th><th>Department</th><th>Today Hours</th><th>Leave</th><th></th></tr></thead>
+            <tbody>
+            {% for row in employee_rows %}
+                <tr>
+                    {% with employee=row.employee record=row.today_record %}
+                    <td>{{ employee.get_full_name|default:employee.username }}</td>
+                    <td>{{ employee.employee_code|default:"-" }}</td>
+                    <td>{{ employee.get_role_display }}</td>
+                    <td>{{ employee.department|default:"-" }}</td>
+                    <td>{% if record %}{{ record.total_work_hours_display }}{% else %}-{% endif %}</td>
+                    <td>{{ employee.used_leave_days }} / {{ employee.allowed_leave_days }}</td>
+                    <td><a class="button small" href="{% url 'edit_employee' employee.pk %}">Edit</a></td>
+                    {% endwith %}
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">No employees yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section>
+    <h2>Recent Attendance</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Employee</th><th>Date</th><th>Status</th><th>Check In</th><th>Exit</th><th>Working Hours</th><th>Distance</th></tr></thead>
+            <tbody>
+            {% for record in recent_records %}
+                <tr>
+                    <td>{{ record.employee.get_full_name|default:record.employee.username }}</td>
+                    <td>{{ record.date }}</td>
+                    <td>{{ record.get_status_display }}</td>
+                    <td>{{ record.check_in_time|date:"h:i A"|default:"-" }}</td>
+                    <td>{{ record.check_out_time|date:"h:i A"|default:"-" }}</td>
+                    <td>{{ record.total_work_hours_display }}</td>
+                    <td>{{ record.distance_from_office_meters|floatformat:0|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">No attendance records.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
