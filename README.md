@@ -179,7 +179,7 @@ bash build.sh
 Render start command:
 
 ```bash
-python manage.py migrate && python manage.py create_default_admin --username "${ADMIN_USERNAME:-admin}" --password "${ADMIN_PASSWORD:-admin}" && gunicorn attendance_project.wsgi:application
+bash start.sh
 ```
 
 The build script runs:
@@ -192,10 +192,10 @@ python manage.py collectstatic --no-input
 Render runs migrations before deployment and again before startup for first PostgreSQL deploy safety:
 
 ```bash
-python manage.py migrate
+python manage.py migrate --noinput
 ```
 
-Render creates the default admin after the first successful deployment and verifies it before startup:
+Render creates or verifies the default admin before startup:
 
 ```bash
 python manage.py create_default_admin --username "${ADMIN_USERNAME:-admin}" --password "${ADMIN_PASSWORD:-admin}"
