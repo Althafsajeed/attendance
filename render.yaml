@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: attendance
+    runtime: python
+    plan: free
+    buildCommand: bash build.sh
+    preDeployCommand: python manage.py migrate
+    startCommand: gunicorn attendance_project.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        value: admin
+      - key: DATABASE_URL
+        fromDatabase:
+          name: attendance-db
+          property: connectionString
+    initialDeployHook: python manage.py create_default_admin --username "${ADMIN_USERNAME:-admin}" --password "${ADMIN_PASSWORD:-admin}"
+
+databases:
+  - name: attendance-db
+    plan: free

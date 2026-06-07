@@ -148,6 +148,68 @@ EMAIL_HOST_PASSWORD = "your-app-password"
 DEFAULT_FROM_EMAIL = "Attendance System <your-email@gmail.com>"
 ```
 
+## Render Deployment
+
+Push this project to GitHub, then deploy from Render.
+
+Render setup:
+
+1. Open Render dashboard.
+2. Choose `New`.
+3. Choose `Blueprint`.
+4. Select this GitHub repository.
+5. Render will read `render.yaml`.
+6. Create the service and database.
+
+The `render.yaml` file creates:
+
+- Web service named `attendance`
+- Free PostgreSQL database named `attendance-db`
+- Production environment variables
+- Build command
+- Pre-deploy migration command
+- Gunicorn start command
+
+Render build command:
+
+```bash
+bash build.sh
+```
+
+Render start command:
+
+```bash
+gunicorn attendance_project.wsgi:application
+```
+
+The build script runs:
+
+```bash
+pip install -r requirements.txt
+python manage.py collectstatic --no-input
+```
+
+Render runs migrations before deployment:
+
+```bash
+python manage.py migrate
+```
+
+Render creates the default admin after the first successful deployment:
+
+```bash
+python manage.py create_default_admin --username "${ADMIN_USERNAME:-admin}" --password "${ADMIN_PASSWORD:-admin}"
+```
+
+After deployment, login with:
+
+```text
+Username: admin
+Password: admin
+```
+
+For security, change `ADMIN_PASSWORD` in Render environment variables after first deployment.
+
 ## Useful Commands
 
 ```powershell
