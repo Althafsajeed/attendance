@@ -47,7 +47,7 @@
             {% for leave in leave_requests %}
                 <tr>
                     <td>{{ leave.employee.get_full_name|default:leave.employee.username }}</td>
-                    <td>{{ leave.manager.get_full_name|default:leave.manager.username|default:"Admin" }}</td>
+                    <td>{% if leave.manager %}{{ leave.manager.get_full_name|default:leave.manager.username }}{% else %}Admin{% endif %}</td>
                     <td>{{ leave.start_date }} to {{ leave.end_date }}</td>
                     <td>{{ leave.reason|truncatechars:80 }}</td>
                     <td><a class="button small" href="{% url 'review_leave_request' leave.pk %}">Review</a></td>
